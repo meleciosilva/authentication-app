@@ -9,13 +9,23 @@ app.use(express.json());
 
 const secret = "tHEBigseCrETheRE";
 
-app.post("/create-token", (req, res) => {
-  const { id, username } = req.body;
+app.post("/sign-token", (req, res) => {
+  const { firstName, lastName, id } = req.body;
+  const requiredKeys = ["firstName", "lastName", "id"];
   
+  requiredKeys.forEach(key => {
+    if (!req.body[key]) {
+      const error = `A '${key}' property is required.`;
+      res.status(400).json({ message: error });
+    }
+  });
+
   const payload = {
-    username,
+    firstName,
+    lastName,
     id
   }
+
   const expiry = 36000;
 
   jwt.sign(payload, secret, { expiresIn: expiry }, (err, token) => {
